@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-sre.local/contracts/phase4_solution_report_v1.schema.json",
+  "title": "Final combined Phase 3 and Phase 4 solution report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "report_status", "run_id", "incident_id", "correlation_id",
+    "completed_at", "matching_context", "phase3_analysis", "phase4_outcome", "artifact_manifest"
+  ],
+  "properties": {
+    "schema_version": {"const": "phase4.solution-report.v1"},
+    "report_status": {"const": "FINAL"},
+    "run_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "incident_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "correlation_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "matching_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "environment", "target_service", "incident_class", "symptoms"],
+      "properties": {
+        "system": {"type": "string", "minLength": 1},
+        "environment": {"type": "string", "minLength": 1},
+        "target_service": {"type": "string", "minLength": 1},
+        "incident_class": {"type": "string", "minLength": 1},
+        "symptoms": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "software_versions": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}}
+      }
+    },
+    "phase3_analysis": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["source_artifact", "observations", "technical_solution"],
+      "properties": {
+        "source_artifact": {"$ref": "#/$defs/artifact"},
+        "observations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "technical_solution": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["consensus_rc", "primary_component", "action_commands", "calculated_confidence", "safety_violation"],
+          "properties": {
+            "consensus_rc": {"type": "string", "minLength": 1},
+            "primary_component": {"type": "string", "minLength": 1},
+            "action_commands": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+            "calculated_confidence": {"type": "number", "minimum": 0, "maximum": 100},
+            "safety_violation": {"type": "boolean"}
+          }
+        }
+      }
+    },
+    "phase4_outcome": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "source_artifact", "gate_decision", "before_state", "agent_proposal", "guardrail_result",
+        "execution_result", "after_state", "fault_cleared", "human_intervention_required", "performance"
+      ],
+      "properties": {
+        "source_artifact": {"$ref": "#/$defs/artifact"},
+        "gate_decision": {
+          "enum": ["EXECUTED", "BLOCKED_SAFETY_VIOLATION", "BLOCKED_GUARDRAIL", "BLOCKED_UNMAPPED", "SKIPPED_NO_SUITABLE_FAULT"]
+        },
+        "before_state": {"type": ["object", "null"]},
+        "agent_proposal": {"type": ["object", "null"]},
+        "guardrail_result": {"type": ["object", "null"]},
+        "execution_result": {"type": ["object", "null"]},
+        "after_state": {"type": ["object", "null"]},
+        "fault_cleared": {"type": ["boolean", "null"]},
+        "human_intervention_required": {"type": "boolean"},
+        "message": {"type": ["string", "null"]},
+        "performance": {"type": "object"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"gate_decision": {"const": "EXECUTED"}}},
+          "then": {
+            "properties": {
+              "fault_cleared": {"type": "boolean"},
+              "human_intervention_required": {"const": false}
+            }
+          },
+          "else": {
+            "properties": {
+              "fault_cleared": {"type": "null"},
+              "human_intervention_required": {"const": true}
+            }
+          }
+        }
+      ]
+    },
+    "artifact_manifest": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"$ref": "#/$defs/artifact"}
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "path", "sha256"],
+      "properties": {
+        "phase": {"enum": ["phase1", "phase2", "phase3", "phase4"]},
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  }
+}
