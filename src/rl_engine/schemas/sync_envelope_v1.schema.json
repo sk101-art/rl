@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-sre.local/contracts/sync_envelope_v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event_id", "event_type", "run_id", "created_at", "payload_sha256", "payload"],
+  "properties": {
+    "schema_version": {"const": "rl.sync-envelope.v1"},
+    "event_id": {"type": "string", "pattern": "^evt_[a-f0-9]{32}$"},
+    "event_type": {"enum": ["APPROACH_SAVED", "USER_DECISION_RECORDED"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "payload_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "payload": {"type": "object"}
+  }
+}

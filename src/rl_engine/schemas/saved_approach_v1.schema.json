@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-sre.local/contracts/saved_approach_v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "approach_id", "run_id", "incident_id", "fingerprint_sha256",
+    "matching_context", "phase3_solution", "phase4_verification", "source_report_sha256",
+    "saved_by", "saved_at", "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "rl.saved-approach.v1"},
+    "approach_id": {"type": "string", "pattern": "^appr_[a-f0-9_]+$"},
+    "run_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "fingerprint_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "matching_context": {"type": "object"},
+    "phase3_solution": {"type": "object"},
+    "phase4_verification": {"type": "object"},
+    "source_report_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "saved_by": {"type": "string", "minLength": 1},
+    "saved_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "VALIDATED"}
+  }
+}

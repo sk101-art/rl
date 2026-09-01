@@ -1,0 +1,76 @@
+{
+  "schema_version": "phase4.solution-report.v1",
+  "report_status": "FINAL",
+  "run_id": "run_laptop1_fixture_001",
+  "incident_id": "case_11_pg_connection_exhaustion",
+  "correlation_id": "corr_laptop1_fixture_001",
+  "completed_at": "2026-09-01T12:00:00Z",
+  "matching_context": {
+    "system": "Auto SRE",
+    "environment": "Shadow Docker Compose",
+    "target_service": "postgres-db",
+    "incident_class": "connection exhaustion",
+    "symptoms": ["active connections equal max connections", "health check failing"],
+    "software_versions": {"postgres": "16.2"}
+  },
+  "phase3_analysis": {
+    "source_artifact": {
+      "phase": "phase3",
+      "path": "phase3/case_11.json",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "observations": [
+      "PostgreSQL reached its configured connection ceiling.",
+      "The application health check failed while the pool was saturated."
+    ],
+    "technical_solution": {
+      "consensus_rc": "Connection pool demand reached max_connections.",
+      "primary_component": "Database",
+      "action_commands": ["Adjust max_connections within the approved shadow bound."],
+      "calculated_confidence": 83,
+      "safety_violation": false,
+      "consensus_quality": "HIGH"
+    }
+  },
+  "phase4_outcome": {
+    "source_artifact": {
+      "phase": "phase4",
+      "path": "phase4/case_11_20260901T120000Z.json",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    "gate_decision": "EXECUTED",
+    "before_state": {"active_connections": 100, "max_connections": 100},
+    "agent_proposal": {
+      "tool": "run_query",
+      "target": "shadow-postgres-db",
+      "parameters": {"setting": "max_connections", "value": 200}
+    },
+    "guardrail_result": {"passed": true, "reason": null},
+    "execution_result": {"executed": true, "tool_output": "Setting applied in shadow environment."},
+    "after_state": {"active_connections": 42, "max_connections": 200},
+    "fault_cleared": true,
+    "human_intervention_required": false,
+    "message": null,
+    "performance": {
+      "safety_check_time_s": 0.01,
+      "agent_proposal_time_s": 11.4,
+      "guardrail_check_time_s": 0.02,
+      "execution_time_s": 1.8,
+      "settle_wait_time_s": 10.0,
+      "state_recheck_time_s": 0.3,
+      "total_pipeline_time_s": 23.53
+    }
+  },
+  "artifact_manifest": [
+    {
+      "phase": "phase3",
+      "path": "phase3/case_11.json",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    {
+      "phase": "phase4",
+      "path": "phase4/case_11_20260901T120000Z.json",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ]
+}

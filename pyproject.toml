@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "auto-sre-rl"
+version = "0.1.0"
+description = "Post-Phase-4 solution learning and synchronization boundary"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+rl-engine = "rl_engine.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rl_engine = ["schemas/*.json"]
